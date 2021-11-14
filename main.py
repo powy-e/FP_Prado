@@ -257,6 +257,10 @@ def reset_fome(animal):
 
 
 def eh_animal(arg):
+    """
+    eh_animal: universal -> booleano
+    Esta funcao verifica se o argumento passado corresponde a um animal
+    """
     def elementos_na_lista(arg: iter,lista: iter)-> bool:
         """
         retorna True se todos os elementos de arg estiverem contidos em lista
@@ -302,3 +306,20 @@ def eh_animal(arg):
 
     return True
 
+
+def eh_predador(arg):
+    """
+    eh_predador: universal -> booleano
+    retorna True se for um predador
+    """
+
+    return eh_animal(arg) and arg["tipo"] == "predador"
+
+
+def eh_presa(arg):
+    """
+    eh_presa: universal -> booleano
+    retorna True se for uma presa
+    """
+
+    return eh_animal(arg) and arg["tipo"] == "presa"
