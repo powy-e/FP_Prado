@@ -16,6 +16,9 @@ from functools import reduce
     #    lst.append([0]*(x))
 
 
+#### TAD POSICAO
+
+
 def cria_posicao(x: int, y: int):
     """
     cria_posicao: int x int -> posicao
@@ -117,6 +120,185 @@ def ordenar_posicoes(tup):
 
         lst[i], lst[min_index] = lst[min_index], lst[i]
 
-
     return tuple(lst)
+
+
+######   TAD ANIMAL
+
+def cria_animal(especie, repro, comida):
+    """
+    cria_animal: str x int x int -> animal
+    esta funcao cria um animal com base nos argumentos dados (especie, frequencia de reproducao e de alimentacao)
+    """
+
+    if not especie or repro <= 0 or comida < 0:
+        raise ValueError("cria_animal: argumentos invalidos")
+
+
+    animal = {"especie": especie, "repro": [0,repro], "idade": 0}
+
+    if comida != 0:
+        animal["comida"] = [0, comida]
+        animal["tipo"] = "predador"
+    else:
+        animal["tipo"] = "presa"
+
+    return animal
+
+
+def cria_animal_copia(animal):
+    """
+    cria_copia_animal: animal -> animal
+    cria uma copia de um animal
+    """
+
+    animal_novo = {key: animal[key] for key in animal}
+    try:
+        animal_novo["comida"] = animal_novo["comida"][:]
+    except KeyError:
+        pass
+    finally:
+        animal_novo["repro"] = animal_novo["repro"][:]
+
+    return animal_novo
+
+
+def obter_especie(animal):
+    """
+    obter_especie: animal -> str
+    devolve a especie de um animal
+    """
+
+    return animal["especie"]
+
+
+
+def obter_freq_reproducao(animal):
+    """
+    obter_freq_reproducao: animal -> int
+    retorna a frequencia de reproducao de um animal
+    """
+
+    return animal["repro"][1]
+
+
+def obter_freq_alimentacao(animal):
+    """
+    obter_freq_alimentacao: animal -> int
+    retorna a frequencia de alimentacao de um animal
+    """
+    try:
+        return animal["comida"][1]
+    except KeyError:
+        return 0
+
+def obter_idade(animal):
+    """
+    obter_idade: animal -> int
+    devolve a idade do animal
+    """
+
+    return animal["idade"]
+
+
+def obter_fome(animal):
+    """
+    obter_fome: animal -> int
+    retorna a fome do animal
+    """
+    try:
+        return animal["comida"][0]
+    except KeyError:
+        return 0
+
+def aumenta_idade(animal):
+    """
+    aumenta_idade: animal -> animal
+    devolve o animal com a idade incrementada por 1
+    """
+    animal["idade"] += 1
+
+    return animal
+
+
+def reset_idade(animal):
+    """
+    reset_idade: animal -> animal
+    devolve o animal com a idade definida a 0
+    """
+
+    animal["idade"] = 0
+
+    return animal
+
+def aumenta_fome(animal):
+    """
+    aumenta_fome: animal -> animal
+    devolve o animal com a fome incrementada por 1 se este for um predador, caso contrario devolve o animal
+    """
+    try:
+        animal["comida"][0] += 1
+    except KeyError:
+        pass
+    return animal
+
+
+def reset_fome(animal):
+    """
+    reset_idade: animal -> animal
+    devolve o animal com a fome definifa a 0 se este for um predador, caso contrario devolve o animal
+    """
+    try:
+        animal["comida"][0] = 0
+    except KeyError:
+        pass
+
+    return animal
+
+
+def eh_animal(arg):
+    def elementos_na_lista(arg: iter,lista: iter)-> bool:
+        """
+        retorna True se todos os elementos de arg estiverem contidos em lista
+        """
+        return reduce(lambda x, y: x and y, map(lambda x: x in lista, arg))
+
+    if type(arg) != dict or not elementos_na_lista(arg,["tipo", "especie", "repro","idade","comida"]):
+        return False
+
+    ####### DEVE HAVER algo REDUNDANTE COM O CHECK EM CIMA E AS LENGTHS TOO BAD
+
+    if not elementos_na_lista(["tipo", "especie", "repro", "idade"], arg) or not(len(arg) == 4 or len(arg) ==5):
+        return False
+
+
+    #### verificar tipo
+    if arg["tipo"] == "predador":
+        ### verificar comida
+        if "comida" not in arg:
+            return False
+        elif type(arg["comida"]) != list or len(arg["comida"]) != 2 or type(arg["comida"][0]) != int or \
+                type(arg["comida"][1]) != int or arg["comida"][0] < 0 or arg["comida"][1] <= 0:
+            return False
+    elif arg["tipo"] == "presa":
+        if len(arg) != 4:
+            return False
+    else:
+        return False
+
+    ##verificar especie
+    if type(arg["especie"]) != str or not arg["especie"]:
+        return False
+
+    # verificar isto e igual a verificar comida aparentemente
+    if type(arg["repro"]) != list or len(arg["repro"]) != 2 or type(arg["repro"][0]) != int or \
+            type(arg["repro"][1]) != int or arg["repro"][0] < 0 or arg["repro"][1] <= 0:
+        return False
+
+
+    ### verificar idade
+    if type(arg["idade"]) != int or arg["idade"] < 0:
+        return False
+
+    return True
 
