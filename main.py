@@ -32,6 +32,9 @@ def cria_copia_posicao(pos):
     cria_copia_posicao: posicao -> posicao
     esta funcao cria uma copia de uma posicao
     """
+    if not eh_posicao(pos):
+        raise ValueError("cria_copia_posicao: argumentos invalidos")
+
     return pos
 
 
@@ -62,9 +65,58 @@ def eh_posicao(arg):
 def posicoes_iguais(p1,p2):
     """
     posicoes_iguais: posicao x posicao -> booleano
-    devolve True se p1 e p2 sao posicoes iguais             FAZEMOS VALUEERROR????
+    devolve True se p1 e p2 sao posicoes iguais
     """
 
+    return eh_posicao(p1) == eh_posicao(p2) and p1 == p2
 
 
+def posicao_para_str(pos):
+    """
+    posicao_para_str: posicao -> str
+    devolve uma string que representa a posicao
+    """
+
+    return str(pos)
+
+
+def obter_posicoes_adjacentes(pos):
+    """
+    obter_posicoes_adjacentes: posicao -> tuplo
+    devolve um tuplo com as posicoes adjacentes ordenadas
+    """
+    x = obter_pos_x(pos)
+    y = obter_pos_y(pos)
+    adj_pos = ()
+    if y != 0:
+        adj_pos += ((cria_posicao(x,y-1)),)
+    adj_pos += (cria_posicao(x+1,y), cria_posicao(x,y+1))
+    if x != 0:
+        adj_pos += (cria_posicao(x-1,y), )
+
+    return adj_pos
+
+
+def ordenar_posicoes(tup):
+    """
+    ordenar_posicoes: tuplo -> tuplo
+    retorna o tuplo original ordenado
+    """
+
+    lst = list(tup)
+
+    for i in range(len(lst) - 1):
+        min_index = i
+        for j in range(i + 1, len(lst)):                #procura o menor elemento da lista (isto é menor y, menor x)
+            if obter_pos_y(lst[j]) < obter_pos_y(lst[min_index]):
+                min_index = j
+
+            elif obter_pos_y(lst[j]) == obter_pos_y(lst[min_index]):
+                if obter_pos_x(lst[j]) < obter_pos_x(lst[min_index]):
+                    min_index = j
+
+        lst[i], lst[min_index] = lst[min_index], lst[i]
+
+
+    return tuple(lst)
 
