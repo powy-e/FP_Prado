@@ -323,3 +323,82 @@ def eh_presa(arg):
     """
 
     return eh_animal(arg) and arg["tipo"] == "presa"
+
+
+def animais_iguais(animal_1, animal_2):
+    """
+    animais_iguais: animal x animal -> booleano
+    devolve True apenas se a1 e a2 s ̃ao animais e sa ̃o iguais.
+
+    """
+
+
+    return eh_animal(animal_1) and eh_animal(animal_2) and animal_1 == animal_2
+
+
+def animal_para_char(animal):
+    """
+    animal_para_char: animal -> str
+    devolve uma string do primeiro caracter correspondente a especie do animal, em maiuscula se for Predador,
+    minuscula se for presa
+    """
+
+    if animal["tipo"] == "predador":
+        return animal["especie"][0].upper()
+    else:
+        return animal["especie"][0].lower()
+
+
+def animal_para_str(animal):
+    """
+    animal_para_str: animal -> cadeia de caracteres
+    devolve o animal em formato de string
+    """
+
+    if eh_predador(animal):
+        string = f"{obter_especie(animal)} [{obter_idade(animal)}/{obter_freq_reproducao(animal)};\
+{obter_fome(animal)}/{obter_freq_alimentacao(animal)}]"
+    else:
+        string = f"{obter_especie(animal)} [{obter_idade(animal)}/{obter_freq_reproducao(animal)}]"
+
+    return string
+
+
+### ALTO NIVEl
+
+def eh_animal_fertil(animal):
+    """
+    eh_animal_fertil: animal -> booleano
+    retorna True se o animal atingiu a idade fertil
+    """
+
+    return obter_idade(animal) >= obter_freq_reproducao(animal)
+
+
+def eh_animal_faminto(animal):
+    """
+    eh_animal_faminto: animal -> booleano
+    retorna true se o animal tiver fome maior que a sua frequencia de alimentacao
+    """
+
+    if eh_predador(animal):
+        return obter_fome(animal) >= obter_freq_alimentacao(animal)
+    else:
+        return False
+
+
+def reproduz_animal(animal):
+    """
+    reproduz_animal: animal -> animal
+    retorna um novo animal baseado nas caracteristicas do animal fornecido como argumento mas com idade e fome a 0,
+    a idade do animal fornecido como argumento passa a 0
+    """
+
+    reset_idade(animal)
+    animal_novo = cria_animal_copia(animal)
+    if eh_predador(animal_novo):
+        reset_fome(animal_novo)
+
+    return animal_novo
+
+
