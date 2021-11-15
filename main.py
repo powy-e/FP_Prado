@@ -458,3 +458,110 @@ def cria_prado_copia(prado):
 
     return novo_prado
 
+
+def obter_tamanho_x(prado):
+    """
+    obter_tamanho_x: prado -> int
+    devolve a dimensao X do prado
+    """
+
+    return len(prado[0])
+
+
+def obter_tamanho_y(prado):
+    """
+    obter_tamanho_y: prado -> int
+    devolve a dimensao Y do prado
+    """
+
+    return len(prado)
+
+
+def obter_numero_predadores(prado):
+    """
+    obter_numero_predadores: prado -> int
+    retorna o numero de predadores no prado
+    """
+
+    cont = 0
+    for linha in prado:
+        for pos in prado[0]:
+            if type(pos) != int and eh_predador(pos):
+                cont += 1
+
+    return cont
+
+
+def obter_numero_presas(prado):
+    """
+    obter_numero_presas: prado -> int
+    retorna o numero de presas no prado
+    """
+
+    cont = 0
+    for linha in prado:
+        for pos in prado[0]:
+            if type(pos) != int and eh_presa(pos):
+                cont += 1
+
+    return cont
+
+def obter_posicao_animais(prado):
+    """
+    obter_posicao_animais: prado -> tuplo posicoes
+    devolve um tuplo com as posicoes do prado ocupadas por animais, ordenadas em ordem de leitura do prado.
+    """
+
+    ani_pos = tuple()
+    for y in range(len(prado)):
+        for x in range(len(prado[0])):
+            if type(prado[y][x]) != int:
+                ani_pos += (cria_posicao(x,y),)
+
+    return ani_pos
+
+
+def obter_animal(prado, pos):
+    """
+    obter_animal: prado x posicao -> animal
+    devolve o animal que esta na posicao pos
+    """
+
+    return prado[obter_pos_y(pos)][obter_pos_x(pos)]
+
+
+def eliminar_animal(prado, pos):
+    """
+    eliminar_animal: prado x posicao -> prado
+    retorna o prado com a posicao, onde se encontrava o animal, livre
+    """
+
+    prado[obter_pos_y(pos)][obter_pos_x(pos)] = 0
+
+
+    return prado
+
+def mover_animal(prado, pos_antiga, pos):
+    """
+    mover animal: prado x posicao x posicao -> prado
+    modifica o prado, movendo o animal da posicao antiga para a posicao nova, deixando a posicao
+    antiga livre
+    """
+
+    prado[obter_pos_y(pos)][obter_pos_x(pos)] = prado[obter_pos_y(pos_antiga)][obter_pos_x(pos_antiga)]
+    eliminar_animal(prado, pos_antiga)
+
+    return prado
+
+
+def inserir_animal(prado, animal, pos):
+    """
+    inserir_animal: prado x animal x posicao -> prado
+    retorna o prado com um animal na posicao pos
+    """
+
+    prado[obter_pos_y(pos)][obter_pos_x(pos)] = animal
+
+    return prado
+
+
