@@ -154,13 +154,13 @@ def cria_animal_copia(animal):
     cria uma copia de um animal
     """
 
+    # fazer copia dos elementos (shallow)
     animal_novo = {key: animal[key] for key in animal}
-    try:
+
+    # fazer copia dos dicionarios
+    if animal_novo["tipo"] == "predador":
         animal_novo["comida"] = animal_novo["comida"][:]
-    except KeyError:
-        pass
-    finally:
-        animal_novo["repro"] = animal_novo["repro"][:]
+    animal_novo["repro"] = animal_novo["repro"][:]
 
     return animal_novo
 
@@ -219,7 +219,7 @@ def aumenta_idade(animal):
     aumenta_idade: animal -> animal
     devolve o animal com a idade incrementada por 1
     """
-    animal["idade"] += 1
+    animal["repro"][0] += 1
 
     return animal["repro"][0]
 
@@ -249,7 +249,7 @@ def aumenta_fome(animal):
 
 def reset_fome(animal):
     """
-    reset_idade: animal -> animal
+    reset_fome: animal -> animal
     devolve o animal com a fome definifa a 0 se este for um predador, caso contrario devolve o animal
     """
     try:
