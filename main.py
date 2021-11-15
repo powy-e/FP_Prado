@@ -137,7 +137,7 @@ def cria_animal(especie, repro, comida):
     if not especie or repro <= 0 or comida < 0:
         raise ValueError("cria_animal: argumentos invalidos")
 
-    animal = {"especie": especie, "repro": [0, repro], "idade": 0}
+    animal = {"especie": especie, "repro": [0, repro]}
 
     if comida != 0:
         animal["comida"] = [0, comida]
@@ -200,7 +200,7 @@ def obter_idade(animal):
     devolve a idade do animal
     """
 
-    return animal["idade"]
+    return animal["repro"][0]
 
 
 def obter_fome(animal):
@@ -221,7 +221,7 @@ def aumenta_idade(animal):
     """
     animal["idade"] += 1
 
-    return animal
+    return animal["repro"][0]
 
 
 def reset_idade(animal):
@@ -230,7 +230,7 @@ def reset_idade(animal):
     devolve o animal com a idade definida a 0
     """
 
-    animal["idade"] = 0
+    animal["repro"][0]= 0
 
     return animal
 
@@ -272,12 +272,12 @@ def eh_animal(arg):
         """
         return reduce(lambda x, y: x and y, map(lambda x: x in lista, arg))
 
-    if type(arg) != dict or not elementos_na_lista(arg, ["tipo", "especie", "repro", "idade", "comida"]):
+    if type(arg) != dict or not elementos_na_lista(arg, ["tipo", "especie", "repro", "comida"]):
         return False
 
     ####### DEVE HAVER algo REDUNDANTE COM O CHECK EM CIMA E AS LENGTHS TOO BAD
 
-    if not elementos_na_lista(["tipo", "especie", "repro", "idade"], arg) or not (len(arg) == 4 or len(arg) == 5):
+    if not elementos_na_lista(["tipo", "especie", "repro"], arg) or not (len(arg) == 3 or len(arg) == 4):
         return False
 
     #### verificar tipo
@@ -289,7 +289,7 @@ def eh_animal(arg):
                 type(arg["comida"][1]) != int or arg["comida"][0] < 0 or arg["comida"][1] <= 0:
             return False
     elif arg["tipo"] == "presa":
-        if len(arg) != 4:
+        if len(arg) != 3:
             return False
     else:
         return False
@@ -304,7 +304,7 @@ def eh_animal(arg):
         return False
 
     ### verificar idade
-    if type(arg["idade"]) != int or arg["idade"] < 0:
+    if type(arg["repro"][0]) != int or arg["repro"][0] < 0:
         return False
 
     return True
