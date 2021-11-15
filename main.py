@@ -188,10 +188,9 @@ def obter_freq_alimentacao(animal):
     obter_freq_alimentacao: animal -> int
     retorna a frequencia de alimentacao de um animal
     """
-    try:
+    if animal["tipo"] == "predador":
         return animal["comida"][1]
-    except KeyError:
-        return 0
+    return 0
 
 
 def obter_idade(animal):
@@ -208,10 +207,9 @@ def obter_fome(animal):
     obter_fome: animal -> int
     retorna a fome do animal
     """
-    try:
+    if animal["tipo"] == "predador":
         return animal["comida"][0]
-    except KeyError:
-        return 0
+    return 0
 
 
 def aumenta_idade(animal):
@@ -240,10 +238,9 @@ def aumenta_fome(animal):
     aumenta_fome: animal -> animal
     devolve o animal com a fome incrementada por 1 se este for um predador, caso contrario devolve o animal
     """
-    try:
+    if animal["tipo"] == "predador":
         animal["comida"][0] += 1
-    except KeyError:
-        pass
+
     return animal
 
 
@@ -252,10 +249,8 @@ def reset_fome(animal):
     reset_fome: animal -> animal
     devolve o animal com a fome definifa a 0 se este for um predador, caso contrario devolve o animal
     """
-    try:
+    if animal["tipo"] == "predador":
         animal["comida"][0] = 0
-    except KeyError:
-        pass
 
     return animal
 
