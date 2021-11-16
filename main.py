@@ -565,3 +565,17 @@ def inserir_animal(prado, animal, pos):
     return prado
 
 
+def eh_prado(arg):
+    """
+    eh_prado: universal -> booleano
+
+    Devolve True se o argumento passado for do TAD prado
+    """
+
+    # Pode-se passar para um for algumas cenas talvez seja mais rapido
+    if type(arg) != list or any(map(lambda x: type(x) != list, arg)) or any(map(lambda x: len(x) != len(arg[0]), arg)):
+        return False
+
+    for linha in arg:
+        for el in linha:
+            if type(el) !=
