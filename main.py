@@ -609,6 +609,43 @@ def prado_para_str(prado):
     return prado_str
 
 
+   ##alto nivel
+
+
+def obter_valor_numerico(prado, pos):
+    """
+    obter_valor_numerico: prado x posicao -> int
+    retorna o numero da posicao que corresponde a ordem de leitura no prado.
+    """
+
+    return obter_tamanho_x(prado) * obter_pos_y(pos) + obter_pos_x(pos)
+
+
+def obter_movimento(prado, pos):
+    """
+    obter_movimento: prado x posicao -> posicao
+    retorna a posicao seguinte do animal na posicao de acordo com as regras de movimento dos animais.
+    """
+
+    possibilidades = [x for x in obter_posicoes_adjacentes(pos) if not eh_posicao_obstaculo(prado, x)]
+    if possibilidades:
+        if eh_predador(obter_animal(prado, pos)):
+            n_p = tuple(filter(lambda pos: eh_posicao_animal(prado, pos)
+                                           and eh_presa(obter_animal(prado, pos)), possibilidades))
+            if n_p:
+                return n_p[obter_valor_numerico(prado, pos) % len(n_p)]
+        n_p = tuple(filter(lambda x: eh_posicao_livre(prado,x), possibilidades))
+        if n_p:
+            return n_p[obter_valor_numerico(prado, pos) % len(n_p)]
+
+    return pos
+
+
+
+
+
+
+
 l = (cria_prado(cria_posicao(24, 40), (cria_posicao(2, 3), cria_posicao(4, 1)),
                 (cria_animal("jebbo", 3, 2), cria_animal("jebbo", 3, 2)), (cria_posicao(4, 2), cria_posicao(2, 7))))
 y = cria_prado_copia(l)
@@ -628,3 +665,6 @@ prado = cria_prado(dim, obs, an1+an2, pos)
 
 
 print(prado_para_str(prado))
+
+print(obter_valor_numerico(prado, cria_posicao(9,3)))
+print(obter_movimento(prado, cria_posicao(10,2)))
