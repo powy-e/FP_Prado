@@ -404,39 +404,30 @@ def reproduz_animal(animal):
 def cria_prado(limite, rochas, animais, ani_pos):
     """
     cria prado: posicao x tuplo x tuplo x tuplo -> prado
-    cria, internamente, um mapa
+    retorna um prado
     """
 
-    prado = []
+
 
     if not eh_posicao(limite) or type(rochas) != tuple or any(map(lambda x: not eh_posicao(x), rochas)) or \
             type(animais) != tuple or not animais or any(map(lambda x: not eh_animal(x), animais)) or \
             type(ani_pos) != tuple or len(ani_pos) != len(animais) or any(map(lambda x: not eh_posicao(x), ani_pos)):
         raise ValueError("cria_prado: argumentos invalidos")
 
-    limite_y = (obter_pos_x(limite)+1)
-    # criar canvas
-    for i in range(len(obter_pos_y(limite))+1):
-            prado.append([0]*limite_y)
+    for rochedo in rochas:
+        if obter_pos_x(rochedo) >= obter_pos_x(limite) > 0 or obter_pos_y(rochedo) >= obter_pos_y(limite) > 0:
+            raise ValueError("cria_prado: argumentos invalidos")
+        for animal in ani_pos:
+            if obter_pos_x(animal) >= obter_pos_x(limite) > 0 or obter_pos_y(animal) >= obter_pos_y(limite) > 0 \
+                    or (obter_pos_x(animal) == obter_pos_x(rochedo) and obter_pos_y(animal) == obter_pos_y(rochedo)):
+                raise ValueError("cria_prado: argumentos invalidos")
 
-    # criar montanhas
-        #primeiro e ultima
-    for i in range(len(prado[0])):
-        prado[0][i] = -1
-    for i in range(len(prado[-1])):
-        prado[0][i] = -1
 
-        # lados
-    for i in range(1,len(prado)-1):
-        prado[i][0], prado[i][0] = -1, -1
-
-    # criar rochedos
-    for rocha in rochas:
-        prado[obter_pos_x(rocha)][obter_pos_y(rocha)] = -2
-
-    # colocar animais
+    lista_animais = []
     for i in range(len(animais)):
-        prado[obter_pos_x(ani_pos[i])][obter_pos_y(ani_pos[i])] = animais[i]
+        lista_animais.append([animais[i], ani_pos[i]])
+
+    prado = [limite, list(rochas), lista_animais]
 
     return prado
 
@@ -447,14 +438,6 @@ def cria_prado_copia(prado):
     retorna uma copia do prado
     """
 
-    novo_prado = []
-    for i in range(len(prado)):
-        novo_prado.append([])
-        for j in range(len(prado[i])):
-            if type(prado[i][j]) == int:
-                novo_prado[i].append(prado[i][j])
-            else:
-                novo_prado[i].append(cria_animal_copia(prado[i][j]))
 
     return novo_prado
 
@@ -483,12 +466,6 @@ def obter_numero_predadores(prado):
     retorna o numero de predadores no prado
     """
 
-    cont = 0
-    for linha in prado:
-        for pos in prado[0]:
-            if type(pos) != int and eh_predador(pos):
-                cont += 1
-
     return cont
 
 
@@ -497,13 +474,6 @@ def obter_numero_presas(prado):
     obter_numero_presas: prado -> int
     retorna o numero de presas no prado
     """
-
-    cont = 0
-    for linha in prado:
-        for pos in prado[0]:
-            if type(pos) != int and eh_presa(pos):
-                cont += 1
-
     return cont
 
 def obter_posicao_animais(prado):
@@ -512,11 +482,6 @@ def obter_posicao_animais(prado):
     devolve um tuplo com as posicoes do prado ocupadas por animais, ordenadas em ordem de leitura do prado.
     """
 
-    ani_pos = tuple()
-    for y in range(len(prado)):
-        for x in range(len(prado[0])):
-            if type(prado[y][x]) != int:
-                ani_pos += (cria_posicao(x,y),)
 
     return ani_pos
 
@@ -536,7 +501,6 @@ def eliminar_animal(prado, pos):
     retorna o prado com a posicao, onde se encontrava o animal, livre
     """
 
-    prado[obter_pos_y(pos)][obter_pos_x(pos)] = 0
 
 
     return prado
@@ -548,9 +512,6 @@ def mover_animal(prado, pos_antiga, pos):
     antiga livre
     """
 
-    prado[obter_pos_y(pos)][obter_pos_x(pos)] = prado[obter_pos_y(pos_antiga)][obter_pos_x(pos_antiga)]
-    eliminar_animal(prado, pos_antiga)
-
     return prado
 
 
@@ -560,7 +521,6 @@ def inserir_animal(prado, animal, pos):
     retorna o prado com um animal na posicao pos
     """
 
-    prado[obter_pos_y(pos)][obter_pos_x(pos)] = animal
 
     return prado
 
@@ -572,10 +532,9 @@ def eh_prado(arg):
     Devolve True se o argumento passado for do TAD prado
     """
 
-    # Pode-se passar para um for algumas cenas talvez seja mais rapido
-    if type(arg) != list or any(map(lambda x: type(x) != list, arg)) or any(map(lambda x: len(x) != len(arg[0]), arg)):
-        return False
 
-    for linha in arg:
-        for el in linha:
-            if type(el) !=
+
+    return True
+
+
+print(cria_prado(cria_posicao(24,40),(cria_posicao(2,3),cria_posicao(4,1)), (cria_animal("jebbo",3,2), cria_animal("jebbo",3,2)),(cria_posicao(4,2),cria_posicao(2,7))))
