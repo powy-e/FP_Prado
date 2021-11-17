@@ -479,7 +479,7 @@ def obter_posicao_animais(prado):
     for animal in prado[2]:
         ani_pos.append(animal[1])
 
-    return ani_pos
+    return ordenar_posicoes(ani_pos)
 
 
 def obter_animal(prado, pos):
@@ -502,6 +502,7 @@ def eliminar_animal(prado, pos):
     for animal in prado[2]:
         if posicoes_iguais(pos, animal[1]):
             prado[2].remove(animal)
+            break
 
     return prado
 
@@ -515,8 +516,9 @@ def mover_animal(prado, pos_antiga, pos):
 
     for animal in prado[2]:
         if posicoes_iguais(pos_antiga, animal[1]):
-            prado[2].append([animal[0], pos])
-            prado[2].remove(animal)
+            animal[1] = pos
+            break
+
 
     return prado
 
@@ -628,27 +630,105 @@ def obter_movimento(prado, pos):
     """
 
     possibilidades = [x for x in obter_posicoes_adjacentes(pos) if not eh_posicao_obstaculo(prado, x)]
+    novas_poss = tuple()
     if possibilidades:
         if eh_predador(obter_animal(prado, pos)):
-            n_p = tuple(filter(lambda pos: eh_posicao_animal(prado, pos)
-                                           and eh_presa(obter_animal(prado, pos)), possibilidades))
-            if n_p:
-                return n_p[obter_valor_numerico(prado, pos) % len(n_p)]
-        n_p = tuple(filter(lambda x: eh_posicao_livre(prado,x), possibilidades))
-        if n_p:
-            return n_p[obter_valor_numerico(prado, pos) % len(n_p)]
+            novas_poss = tuple(filter(lambda pos: eh_presa(obter_animal(prado, pos)), possibilidades))
+        if novas_poss:
+            return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
+        novas_poss = tuple(filter(lambda x: eh_posicao_livre(prado,x), possibilidades))
+        if novas_poss:
+            return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
 
     return pos
 
 
+def geracao(prado):
+    """
+    geracao: prado -> prado
+     funcao auxiliar que modifica o prado fornecido como argumento,
+    de acordo com a evolucao correspondente a uma geracao completa, devolvendo o prado
+    """
+
+    posicoes = list(obter_posicao_animais(prado))
+
+    while posicoes:
+        pos = posicoes[0]
+        animal = obter_animal(prado, pos)
+        aumenta_idade(animal)
+        mov = obter_movimento(prado, pos)
+        if eh_predador(animal):
+            aumenta_fome(animal)
+            if eh_presa(mov):
+                eliminar_animal(prado, mov)
+                try:
+                    posicoes.pop(mov)       #animal pode ja ter sido visto ou pode ser uma cria
+                except:
+                    pass
+                reset_fome(animal)
+
+        mover_animal(prado, pos, mov)
+
+        if eh_animal_fertil(animal) and pos != mov:
+            inserir_animal(prado, reproduz_animal(animal), pos)
+
+        if eh_animal_faminto(animal):
+            eliminar_animal(prado, mov)
+
+        posicoes.remove(pos)
+
+    return prado
+
+def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
+
+    # Ler Ficheiro
+
+    with open(fich, "r") as ficheiro:
+        canto = eval(ficheiro.readline())
+        rochas = eval(ficheiro.readline())
+        animais = [eval(linha) for linha in ficheiro.readlines()]
+
+    # Criar Prado
+
+    prado = cria_prado(
+                cria_posicao(canto[0],canto[1]),
+                tuple(map(lambda x: (cria_posicao(x[0], x[1])), rochas)),
+                tuple(map(lambda x: (cria_animal(x[0], x[1], x[2])), animais)),
+                tuple(map(lambda x: (cria_posicao(x[3][0], x[3][1])), animais))
+        )
+
+    ultimos_pred = obter_numero_predadores(prado)
+    ultimas_presas = obter_numero_presas(prado)
+    if not v:
+        print(F"Predadores: {obter_numero_predadores(prado)} vs Presas: {obter_numero_presas(prado)} (Gen. 0)")
+        print(prado_para_str(prado))
+        for g in range(n_geracoes+1):
+            geracao(prado)
+
+        print(F"Predadores: {obter_numero_predadores(prado)} vs Presas: {obter_numero_presas(prado)} (Gen. {g})")
+        print(prado_para_str(prado))
+    else:
+        for g in range(n_geracoes+1):
+            geracao(prado)
+
+            presas = obter_numero_presas(prado)
+            predadores = obter_numero_predadores(prado)
+            if presas != ultimas_presas or predadores != ultimos_pred:
+                ultimos_pred = predadores
+                ultimas_presas = presas
+                print(F"Predadores: {predadores} vs Presas: {presas} (Gen. {g})")
+                print(prado_para_str(prado))
+
+    return obter_numero_predadores(prado), obter_numero_presas(prado)
 
 
 
 
 
-l = (cria_prado(cria_posicao(24, 40), (cria_posicao(2, 3), cria_posicao(4, 1)),
-                (cria_animal("jebbo", 3, 2), cria_animal("jebbo", 3, 2)), (cria_posicao(4, 2), cria_posicao(2, 7))))
-y = cria_prado_copia(l)
+
+#l = (cria_prado(cria_posicao(24, 40), (cria_posicao(2, 3), cria_posicao(4, 1)),
+#                (cria_animal("jebbo", 3, 2), cria_animal("jebbo", 3, 2)), (cria_posicao(4, 2), cria_posicao(2, 7))))
+#y = cria_prado_copia(l)
 
 # pprint.pprint(obter_posicao_animais(y))
 #pprint.pprint(l)
@@ -656,15 +736,29 @@ y = cria_prado_copia(l)
 #pprint.pprint(inserir_animal(y, cria_animal("zucc", 2, 0), (5, 8)))
 #pprint.pprint(eh_prado(l))
 
+#dim = cria_posicao(11, 4)
+#obs = (cria_posicao(4,2), cria_posicao(5,2))
+#an1 = tuple(cria_animal("rabbit", 5, 0) for i in range(3))
+#an2 = (cria_animal("lynx", 20, 15),)
+#pos = tuple(cria_posicao(p[0],p[1]) for p in ((5,1),(7,2),(10,1),(6,1)))
+#prado = cria_prado(dim, obs, an1+an2, pos)
+
+
 dim = cria_posicao(11, 4)
 obs = (cria_posicao(4,2), cria_posicao(5,2))
-an1 = tuple(cria_animal("rabbit", 5, 0) for i in range(3))
-an2 = (cria_animal("lynx", 20, 15),)
-pos = tuple(cria_posicao(p[0],p[1]) for p in ((5,1),(7,2),(10,1),(6,1)))
-prado = cria_prado(dim, obs, an1+an2, pos)
+an1 = tuple(cria_animal("sheep", 2, 0) for i in range(3))
+an2 = (cria_animal("wolf", 10, 3),)
+pos = tuple(cria_posicao(p[0],p[1]) \
+                        for p in ((2,2),(4,3),(10,2),(3,2)))
+#prado = cria_prado(dim, obs, an1+an2, pos)
 
+#print(prado_para_str(prado))
 
-print(prado_para_str(prado))
+#print(prado_para_str(geracao(prado)))
+#print("jeff")
+#print(prado_para_str(geracao(prado)))
+#print(prado_para_str(geracao(prado)))
+#print(obter_valor_numerico(prado, cria_posicao(9,3)))
+#print(obter_movimento(prado, cria_posicao(6,1)))
 
-print(obter_valor_numerico(prado, cria_posicao(9,3)))
-print(obter_movimento(prado, cria_posicao(10,2)))
+simula_ecossistema("config.txt", 200, True)
