@@ -353,7 +353,7 @@ def eh_animal_fertil(animal):
     retorna True se o animal atingiu a idade fertil
     """
 
-    return obter_idade(animal) >= obter_freq_reproducao(animal)
+    return obter_idade(animal) == obter_freq_reproducao(animal)
 
 
 def eh_animal_faminto(animal):
@@ -684,7 +684,10 @@ def geracao(prado):
     while posicoes:
         pos = posicoes[0]                           # escolhe a primeira posicao
         animal = obter_animal(prado, pos)           # pega no animal dessa posicao
-        aumenta_idade(animal)                       # aumenta a idade
+
+        if not eh_animal_fertil(animal):
+            aumenta_idade(animal)                   # aumenta a idade
+
         mov = obter_movimento(prado, pos)           # calcula o movimento que o animal devera efetuar
         if eh_predador(animal):                     # verifica se e predador
             aumenta_fome(animal)                    # aumenta a fome do predador
@@ -700,6 +703,7 @@ def geracao(prado):
 
         if eh_animal_fertil(animal) and pos != mov:
             inserir_animal(prado, reproduz_animal(animal), pos)
+            reset_idade(animal)
 
         if eh_animal_faminto(animal):
             eliminar_animal(prado, mov)
