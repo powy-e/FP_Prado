@@ -1,5 +1,4 @@
 from functools import reduce
-import pprint
 
 
 def cria_posicao(x: int, y: int):
@@ -130,11 +129,14 @@ def cria_animal(especie, repro, comida):
     return animal
 
 
-def cria_animal_copia(animal):
+def cria_copia_animal(animal):
     """
     cria_copia_animal: animal -> animal
     cria uma copia de um animal
     """
+
+    if not eh_animal(animal):
+        raise ValueError("cria_copia_animal: argumentos invalidos")
 
     # fazer copia dos elementos (shallow)
     animal_novo = {key: animal[key] for key in (animal)}
@@ -201,7 +203,7 @@ def aumenta_idade(animal):
     """
     animal["repro"][0] += 1
 
-    return animal["repro"][0]
+    return animal
 
 
 def reset_idade(animal):
@@ -374,7 +376,7 @@ def reproduz_animal(animal):
     """
 
     reset_idade(animal)
-    animal_novo = cria_animal_copia(animal)
+    animal_novo = cria_copia_animal(animal)
     if eh_predador(animal_novo):
         reset_fome(animal_novo)
 
@@ -417,19 +419,19 @@ def cria_prado(limite, rochas, animais, ani_pos):
     return prado
 
 
-def cria_prado_copia(prado):
+def cria_copia_prado(prado):
     """
     cria_copia_prado: prado -> prado
     retorna uma copia do prado
     """
 
     if not eh_prado(prado):
-        raise ValueError("cria_prado_copia: argumentos invalidos")
+        raise ValueError("cria_copia_prado: argumentos invalidos")
 
     novo_prado = [
         cria_copia_posicao(prado[0]),
         tuple([cria_copia_posicao(x) for x in prado[1]]),
-        [[cria_animal_copia(prado[2][x][0]), cria_copia_posicao(prado[2][x][1])] for x in range(len(prado[2]))]
+        [[cria_copia_animal(prado[2][x][0]), cria_copia_posicao(prado[2][x][1])] for x in range(len(prado[2]))]
     ]
 
     return novo_prado
@@ -441,7 +443,7 @@ def obter_tamanho_x(prado):
     devolve a dimensao X do prado
     """
 
-    return prado[0][0] + 1
+    return obter_pos_x(prado[0]) + 1
 
 
 def obter_tamanho_y(prado):
@@ -450,7 +452,7 @@ def obter_tamanho_y(prado):
     devolve a dimensao Y do prado
     """
 
-    return prado[0][1] + 1
+    return obter_pos_y(prado[0]) + 1
 
 
 def obter_numero_predadores(prado):
@@ -584,7 +586,31 @@ def prados_iguais(prado1, prado2):
     devolve True se os prados forem prados e forem iguais
     """
 
-    return eh_prado(prado1) and eh_prado(prado2) and prado1 == prado2
+    if eh_prado(prado1) and eh_prado(prado2) and obter_tamanho_y(prado1) == obter_tamanho_y(prado2)\
+            and obter_tamanho_x(prado1) == obter_tamanho_x(prado1):
+
+        ####
+        pos_prado1 = ordenar_posicoes(prado1[1])
+        pos_prado2 = ordenar_posicoes(prado2[1])
+        for i in range(len(pos_prado1)):
+            if not posicoes_iguais(pos_prado1[i], pos_prado2[i]):
+                return False
+
+        #### verificar os animais e as suas posicoes
+        for animal1 in prado1[2]:
+            contiuar = False
+            for animal2 in prado2[2]:
+                if posicoes_iguais(animal1[1],animal2[1]) and animais_iguais(animal1[0], animal2[0]):
+                    contiuar = True
+                    break
+            if contiuar:
+                continue
+            return False
+    else:
+        return False
+
+    return True
+
 
 
 def prado_para_str(prado):
@@ -697,6 +723,7 @@ def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
                 tuple(map(lambda x: (cria_posicao(x[3][0], x[3][1])), animais))
         )
 
+    ##
     ultimos_pred = obter_numero_predadores(prado)
     ultimas_presas = obter_numero_presas(prado)
     if not v:
@@ -721,44 +748,4 @@ def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
 
     return obter_numero_predadores(prado), obter_numero_presas(prado)
 
-
-
-
-
-
-#l = (cria_prado(cria_posicao(24, 40), (cria_posicao(2, 3), cria_posicao(4, 1)),
-#                (cria_animal("jebbo", 3, 2), cria_animal("jebbo", 3, 2)), (cria_posicao(4, 2), cria_posicao(2, 7))))
-#y = cria_prado_copia(l)
-
-# pprint.pprint(obter_posicao_animais(y))
-#pprint.pprint(l)
-#pprint.pprint(mover_animal(y, (4, 2), (5, 8)))
-#pprint.pprint(inserir_animal(y, cria_animal("zucc", 2, 0), (5, 8)))
-#pprint.pprint(eh_prado(l))
-
-#dim = cria_posicao(11, 4)
-#obs = (cria_posicao(4,2), cria_posicao(5,2))
-#an1 = tuple(cria_animal("rabbit", 5, 0) for i in range(3))
-#an2 = (cria_animal("lynx", 20, 15),)
-#pos = tuple(cria_posicao(p[0],p[1]) for p in ((5,1),(7,2),(10,1),(6,1)))
-#prado = cria_prado(dim, obs, an1+an2, pos)
-
-
-dim = cria_posicao(11, 4)
-obs = (cria_posicao(4,2), cria_posicao(5,2))
-an1 = tuple(cria_animal("sheep", 2, 0) for i in range(3))
-an2 = (cria_animal("wolf", 10, 3),)
-pos = tuple(cria_posicao(p[0],p[1]) \
-                        for p in ((2,2),(4,3),(10,2),(3,2)))
-#prado = cria_prado(dim, obs, an1+an2, pos)
-
-#print(prado_para_str(prado))
-
-#print(prado_para_str(geracao(prado)))
-#print("jeff")
-#print(prado_para_str(geracao(prado)))
-#print(prado_para_str(geracao(prado)))
-#print(obter_valor_numerico(prado, cria_posicao(9,3)))
-#print(obter_movimento(prado, cria_posicao(6,1)))
-
-simula_ecossistema("config.txt", 200, True)
+#print(simula_ecossistema("config.txt",100,True))
