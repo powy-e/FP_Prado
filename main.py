@@ -707,7 +707,7 @@ def geracao(prado):
 
     return prado
 
-def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
+def simula_ecossistema(fich: str, geracoes, v: bool) -> tuple:
 
     # Ler Ficheiro
 
@@ -725,19 +725,15 @@ def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
                 tuple(map(lambda x: (cria_posicao(x[3][0], x[3][1])), animais))
         )
 
-    ##
+    # Executar as Geracoes
+
     ultimos_pred = obter_numero_predadores(prado)
     ultimas_presas = obter_numero_presas(prado)
-    if not v:
-        print(F"Predadores: {obter_numero_predadores(prado)} vs Presas: {obter_numero_presas(prado)} (Gen. 0)")
-        print(prado_para_str(prado))
-        for g in range(n_geracoes+1):
-            geracao(prado)
+    print(F"Predadores: {ultimos_pred} vs Presas: {ultimas_presas} (Gen. 0)")
+    print(prado_para_str(prado))
 
-        print(F"Predadores: {obter_numero_predadores(prado)} vs Presas: {obter_numero_presas(prado)} (Gen. {g})")
-        print(prado_para_str(prado))
-    else:
-        for g in range(n_geracoes+1):
+    if v:   # Verboso
+        for g in range(geracoes):
             geracao(prado)
 
             presas = obter_numero_presas(prado)
@@ -745,9 +741,17 @@ def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
             if presas != ultimas_presas or predadores != ultimos_pred:
                 ultimos_pred = predadores
                 ultimas_presas = presas
-                print(F"Predadores: {predadores} vs Presas: {presas} (Gen. {g})")
+                print(F"Predadores: {predadores} vs Presas: {presas} (Gen. {g + 1})")
                 print(prado_para_str(prado))
+    else:   # Quiet
+        for g in range(geracoes):
+            geracao(prado)
 
-    return obter_numero_predadores(prado), obter_numero_presas(prado)
+        presas = obter_numero_presas(prado)
+        predadores = obter_numero_predadores(prado)
+        print(f"Predadores: {predadores} vs Presas: {presas} (Gen. {geracoes})")
+        print(prado_para_str(prado))
 
-print(simula_ecossistema("config.txt",100,True))
+    return predadores, presas
+
+print(simula_ecossistema("config2.txt",200,False))
