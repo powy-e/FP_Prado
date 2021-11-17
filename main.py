@@ -660,6 +660,8 @@ def obter_movimento(prado, pos):
     if possibilidades:
         if eh_predador(obter_animal(prado, pos)):
             novas_poss = tuple(filter(lambda pos: eh_presa(obter_animal(prado, pos)), possibilidades))
+        else:
+            novas_poss = tuple(filter(lambda pos: eh_posicao_livre(prado, pos), possibilidades))
         if novas_poss:
             return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
         novas_poss = tuple(filter(lambda x: eh_posicao_livre(prado,x), possibilidades))
@@ -685,7 +687,7 @@ def geracao(prado):
         mov = obter_movimento(prado, pos)
         if eh_predador(animal):
             aumenta_fome(animal)
-            if eh_presa(mov):
+            if eh_presa(obter_animal(prado, pos)):
                 eliminar_animal(prado, mov)
                 try:
                     posicoes.pop(mov)       #animal pode ja ter sido visto ou pode ser uma cria
@@ -748,4 +750,4 @@ def simula_ecossistema(fich: str, n_geracoes, v: bool) -> tuple:
 
     return obter_numero_predadores(prado), obter_numero_presas(prado)
 
-#print(simula_ecossistema("config.txt",100,True))
+print(simula_ecossistema("config.txt",100,True))
