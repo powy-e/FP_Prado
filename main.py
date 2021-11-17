@@ -656,14 +656,15 @@ def obter_movimento(prado, pos):
     """
 
     possibilidades = [x for x in obter_posicoes_adjacentes(pos) if not eh_posicao_obstaculo(prado, x)]
-    novas_poss = tuple()
-    if possibilidades:
-        if eh_predador(obter_animal(prado, pos)):
-            novas_poss = tuple(filter(lambda pos: eh_presa(obter_animal(prado, pos)), possibilidades))
-        else:
-            novas_poss = tuple(filter(lambda pos: eh_posicao_livre(prado, pos), possibilidades))
-        if novas_poss:
-            return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
+
+    if possibilidades: # Animal pode-se movimentar
+        if eh_predador(obter_animal(prado, pos)):   # animal e predador
+            novas_poss = tuple(filter(lambda n_p: eh_presa(obter_animal(prado, n_p)), possibilidades))
+            if novas_poss:  # verifica se existem presas ao redor do animal
+                return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
+
+        # caso seja presa ou nao existam presas ao redor do predador
+
         novas_poss = tuple(filter(lambda x: eh_posicao_livre(prado,x), possibilidades))
         if novas_poss:
             return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
@@ -681,18 +682,18 @@ def geracao(prado):
     posicoes = list(obter_posicao_animais(prado))
 
     while posicoes:
-        pos = posicoes[0]
-        animal = obter_animal(prado, pos)
-        aumenta_idade(animal)
-        mov = obter_movimento(prado, pos)
-        if eh_predador(animal):
-            aumenta_fome(animal)
-            if eh_presa(obter_animal(prado, pos)):
+        pos = posicoes[0]                           # escolhe a primeira posicao
+        animal = obter_animal(prado, pos)           # pega no animal dessa posicao
+        aumenta_idade(animal)                       # aumenta a idade
+        mov = obter_movimento(prado, pos)           # calcula o movimento que o animal devera efetuar
+        if eh_predador(animal):                     # verifica se e predador
+            aumenta_fome(animal)                    # aumenta a fome do predador
+            if eh_posicao_animal(prado, pos) and eh_presa(obter_animal(prado, mov)):  # se existir uma presa
                 eliminar_animal(prado, mov)
-                try:
-                    posicoes.pop(mov)       #animal pode ja ter sido visto ou pode ser uma cria
-                except:
-                    pass
+
+                if mov in posicoes:
+                    posicoes.remove(mov)
+
                 reset_fome(animal)
 
         mover_animal(prado, pos, mov)
@@ -754,4 +755,5 @@ def simula_ecossistema(fich: str, geracoes, v: bool) -> tuple:
 
     return predadores, presas
 
-print(simula_ecossistema("config2.txt",200,False))
+#print(simula_ecossistema("config.txt",100,True))
+
