@@ -711,7 +711,7 @@ def geracao(prado):
 
         if eh_animal_faminto(animal):
             eliminar_animal(prado, pos)
-        elif nao_mexe:
+        elif mexe:
             mover_animal(prado, pos, mov)
 
         if eh_animal_fertil(animal) and mexe:
