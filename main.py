@@ -45,7 +45,8 @@ def eh_posicao(arg):
     retorna True se o argumento passado for uma posicao, caso contrario retorna False
     """
 
-    return isinstance(arg, tuple) and len(arg) == 2 and obter_pos_y(arg) >= 0 and obter_pos_x(arg) >= 0
+    return isinstance(arg, tuple) and len(arg) == 2 and isinstance(obter_pos_y(arg), int)\
+           and isinstance(obter_pos_x(arg), int) and obter_pos_y(arg) >= 0 and obter_pos_x(arg) >= 0
 
 
 def posicoes_iguais(p1, p2):
@@ -246,28 +247,23 @@ def eh_animal(arg):
     Esta funcao verifica se o argumento passado corresponde a um animal
     """
 
-    def elementos_na_lista(arg: iter, lista: iter) -> bool:
-        """
-        retorna True se todos os elementos de arg estiverem contidos em lista
-        """
-        return reduce(lambda x, y: x and y, map(lambda x: x in lista, arg))
 
-    if type(arg) != dict or not elementos_na_lista(arg, ["tipo", "especie", "repro", "comida"]):
-        return False
+    # DEVE HAVER algo REDUNDANTE COM O CHECK EM CIMA E AS LENGTHS TOO BAD
 
-    ####### DEVE HAVER algo REDUNDANTE COM O CHECK EM CIMA E AS LENGTHS TOO BAD
-
-    if not elementos_na_lista(["tipo", "especie", "repro"], arg) or not (len(arg) == 3 or len(arg) == 4):
+    if type(arg) != dict or not all(map(lambda x: x in ["tipo", "especie", "repro", "comida"], arg)) or\
+            not all(map(lambda x: x in arg, ["tipo", "especie", "repro"])) or not (len(arg) == 3 or len(arg) == 4):
         return False
 
     #### verificar tipo
     if arg["tipo"] == "predador":
         ### verificar comida
-        if "comida" not in arg:
+        if "comida" in arg:
+            if type(arg["comida"]) != list or len(arg["comida"]) != 2 or type(arg["comida"][0]) != int or \
+                    type(arg["comida"][1]) != int or arg["comida"][0] < 0 or arg["comida"][1] <= 0:
+                return False
+        else:
             return False
-        elif type(arg["comida"]) != list or len(arg["comida"]) != 2 or type(arg["comida"][0]) != int or \
-                type(arg["comida"][1]) != int or arg["comida"][0] < 0 or arg["comida"][1] <= 0:
-            return False
+
     elif arg["tipo"] == "presa":
         if len(arg) != 3:
             return False
@@ -278,13 +274,9 @@ def eh_animal(arg):
     if type(arg["especie"]) != str or not arg["especie"]:
         return False
 
-    # verificar isto e igual a verificar comida aparentemente
+    # idade/reproducao
     if type(arg["repro"]) != list or len(arg["repro"]) != 2 or type(arg["repro"][0]) != int or \
             type(arg["repro"][1]) != int or arg["repro"][0] < 0 or arg["repro"][1] <= 0:
-        return False
-
-    ### verificar idade
-    if type(arg["repro"][0]) != int or arg["repro"][0] < 0:
         return False
 
     return True
