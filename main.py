@@ -697,26 +697,29 @@ def geracao(prado):
         mov = obter_movimento(prado, pos)           # calcula o movimento que o animal devera efetuar
         if eh_predador(animal):                     # verifica se e predador
             aumenta_fome(animal)                    # aumenta a fome do predador
-            if eh_posicao_animal(prado, pos) and eh_presa(obter_animal(prado, mov)):  # se existir uma presa
+            if eh_posicao_animal(prado, mov):  # se existir uma presa
                 eliminar_animal(prado, mov)
 
                 for posicao in posicoes:
-                    if posicoes_iguais(mov,posicao):
+                    if posicoes_iguais(mov, posicao):
                         posicoes.remove(mov)
                         break
 
                 reset_fome(animal)
 
-        mover_animal(prado, pos, mov)
+        mexe = not posicoes_iguais(mov, pos)
 
-        if eh_animal_fertil(animal) and not posicoes_iguais(mov, pos):
+        if eh_animal_faminto(animal):
+            eliminar_animal(prado, pos)
+        elif nao_mexe:
+            mover_animal(prado, pos, mov)
+
+        if eh_animal_fertil(animal) and mexe:
             inserir_animal(prado, reproduz_animal(animal), pos)
             reset_idade(animal)
 
-        if eh_animal_faminto(animal):
-            eliminar_animal(prado, mov)
 
-        posicoes.remove(pos)
+        posicoes = posicoes[1:]
 
     return prado
 
