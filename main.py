@@ -379,14 +379,20 @@ def reproduz_animal(animal):
 #### TAD PRADO
 
 def verificar_rochas_animais(limite, rochas, ani_pos):
-    for rochedo in rochas:
-        if not (0 < obter_pos_x(rochedo) < obter_pos_x(limite)) \
-                or not (0 < obter_pos_y(rochedo) < obter_pos_y(limite)):
-            return False
+    if rochas:
+        for rochedo in rochas:
+            if not (0 < obter_pos_x(rochedo) < obter_pos_x(limite)) \
+                    or not (0 < obter_pos_y(rochedo) < obter_pos_y(limite)):
+                return False
+            for animal in ani_pos:
+                if not (0 < obter_pos_x(animal) < obter_pos_x(limite)) \
+                        or not (0 < obter_pos_y(animal) < obter_pos_y(limite)) \
+                        or posicoes_iguais(animal, rochedo):
+                    return False
+    else:
         for animal in ani_pos:
             if not (0 < obter_pos_x(animal) < obter_pos_x(limite)) \
-                    or not (0 < obter_pos_y(animal) < obter_pos_y(limite)) \
-                    or posicoes_iguais(animal, rochedo):
+                    or not (0 < obter_pos_y(animal) < obter_pos_y(limite)):
                 return False
     return True
 
