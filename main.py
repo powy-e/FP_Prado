@@ -588,23 +588,29 @@ def prados_iguais(prado1, prado2):
     if eh_prado(prado1) and eh_prado(prado2) and obter_tamanho_y(prado1) == obter_tamanho_y(prado2)\
             and obter_tamanho_x(prado1) == obter_tamanho_x(prado1):
 
-        ####
+        ## verifica se os rochedos sao iguas
+
         pos_prado1 = ordenar_posicoes(prado1[1])
         pos_prado2 = ordenar_posicoes(prado2[1])
+        if len(pos_prado1) != len(pos_prado2):
+            return False
         for i in range(len(pos_prado1)):
             if not posicoes_iguais(pos_prado1[i], pos_prado2[i]):
                 return False
 
         #### verificar os animais e as suas posicoes
-        for animal1 in prado1[2]:
-            contiuar = False
-            for animal2 in prado2[2]:
-                if posicoes_iguais(animal1[1],animal2[1]) and animais_iguais(animal1[0], animal2[0]):
-                    contiuar = True
-                    break
-            if contiuar:
-                continue
+
+        if len(prado1[2]) != len(prado2[2]):
             return False
+
+        for animal1 in prado1[2]:    #por animal
+            passa_prox = False
+            for animal2 in prado2[2]:
+                if posicoes_iguais(animal1[1], animal2[1]) and animais_iguais(animal1[0], animal2[0]):
+                    passa_prox = True
+                    break
+            if not passa_prox:
+                return False
     else:
         return False
 
