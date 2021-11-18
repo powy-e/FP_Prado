@@ -702,7 +702,7 @@ def geracao(prado):
 
                 for posicao in posicoes:
                     if posicoes_iguais(mov, posicao):
-                        posicoes.remove(mov)
+                        posicoes.remove(posicao)
                         break
 
                 reset_fome(animal)
@@ -717,7 +717,6 @@ def geracao(prado):
         if eh_animal_fertil(animal) and mexe:
             inserir_animal(prado, reproduz_animal(animal), pos)
             reset_idade(animal)
-
 
         posicoes = posicoes[1:]
 
@@ -816,6 +815,10 @@ def simula_ecossistema_testes(fich: str, geracoes, v: bool) -> tuple:
         print(prado_para_str(prado))
 
     return predadores, presas
+
+
+
+print(simula_ecossistema("config3.txt", 100, False))
 
 
 
