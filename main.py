@@ -695,8 +695,10 @@ def geracao(prado):
             if eh_posicao_animal(prado, pos) and eh_presa(obter_animal(prado, mov)):  # se existir uma presa
                 eliminar_animal(prado, mov)
 
-                if mov in posicoes:
-                    posicoes.remove(mov)
+                for posicao in posicoes:
+                    if posicoes_iguais(mov,posicao):
+                        posicoes.remove(mov)
+                        break
 
                 reset_fome(animal)
 
