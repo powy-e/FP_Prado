@@ -818,7 +818,7 @@ def simula_ecossistema_testes(fich: str, geracoes, v: bool) -> tuple:
 
 
 
-print(simula_ecossistema("config3.txt", 100, False))
+#print(simula_ecossistema("config3.txt", 100, False))
 
 
 
