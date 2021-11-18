@@ -709,7 +709,7 @@ def geracao(prado):
 
         mover_animal(prado, pos, mov)
 
-        if eh_animal_fertil(animal) and pos != mov:
+        if eh_animal_fertil(animal) and not posicoes_iguais(mov, pos):
             inserir_animal(prado, reproduz_animal(animal), pos)
             reset_idade(animal)
 
