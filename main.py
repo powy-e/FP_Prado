@@ -12,7 +12,6 @@ def cria_posicao(x: int, y: int):
     return (x, y)
 
 
-#### isto pode n ser a melhor maneira mas tuplos sao imutaveis logo tecnicamente isto deve funcionar
 def cria_copia_posicao(pos):
     """
     cria_copia_posicao: posicao -> posicao
@@ -21,7 +20,7 @@ def cria_copia_posicao(pos):
     if not eh_posicao(pos):
         raise ValueError("cria_copia_posicao: argumentos invalidos")
 
-    return pos
+    return cria_posicao(pos[0], pos[1])
 
 
 def obter_pos_x(pos):
@@ -115,7 +114,9 @@ def cria_animal(especie, repro, comida):
     esta funcao cria um animal com base nos argumentos dados (especie, frequencia de reproducao e de alimentacao)
     """
 
-    if not especie or repro <= 0 or comida < 0:
+
+    if type(especie) != str or type(repro) != int or type(comida) != int or \
+            not especie or repro <= 0 or comida < 0:
         raise ValueError("cria_animal: argumentos invalidos")
 
     animal = {"especie": especie, "repro": [0, repro]}
@@ -400,7 +401,7 @@ def verificar_rochas_animais(limite, rochas, ani_pos):
 
 def cria_prado(limite, rochas, animais, ani_pos):
     """
-    cria prado: posicao x tuplo x tuplo x tuplo -> prado
+    cria_prado: posicao x tuplo x tuplo x tuplo -> prado
     retorna um prado
     """
 
@@ -759,5 +760,52 @@ def simula_ecossistema(fich: str, geracoes, v: bool) -> tuple:
 
     return predadores, presas
 
-#print(simula_ecossistema("config.txt",100,True))
+
+def simula_ecossistema_testes(fich: str, geracoes, v: bool) -> tuple:
+
+    # Ler Ficheiro
+
+    with open(fich, "r") as ficheiro:
+        canto = eval(ficheiro.readline())
+        rochas = eval(ficheiro.readline())
+        animais = [eval(linha) for linha in ficheiro.readlines()]
+
+    # Criar Prado
+
+    prado = cria_prado(
+                cria_posicao(canto[0],canto[1]),
+                tuple(map(lambda x: (cria_posicao(x[0], x[1])), rochas)),
+                tuple(map(lambda x: (cria_animal(x[0], x[1], x[2])), animais)),
+                tuple(map(lambda x: (cria_posicao(x[3][0], x[3][1])), animais))
+        )
+
+    # Executar as Geracoes
+
+    ultimos_pred = obter_numero_predadores(prado)
+    ultimas_presas = obter_numero_presas(prado)
+    print(F"Predadores: {ultimos_pred} vs Presas: {ultimas_presas} (Gen. 0)")
+    print(prado_para_str(prado))
+
+    if v:   # Verboso
+        for g in range(geracoes):
+            geracao(prado)
+
+            presas = obter_numero_presas(prado)
+            predadores = obter_numero_predadores(prado)
+            ultimos_pred = predadores
+            ultimas_presas = presas
+            print(F"Predadores: {predadores} vs Presas: {presas} (Gen. {g + 1})")
+            print(prado_para_str(prado))
+    else:   # Quiet
+        for g in range(geracoes):
+            geracao(prado)
+
+        presas = obter_numero_presas(prado)
+        predadores = obter_numero_predadores(prado)
+        print(f"Predadores: {predadores} vs Presas: {presas} (Gen. {geracoes})")
+        print(prado_para_str(prado))
+
+    return predadores, presas
+
+
 
