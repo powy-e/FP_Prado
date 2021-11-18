@@ -660,7 +660,8 @@ def obter_movimento(prado, pos):
 
     if possibilidades: # Animal pode-se movimentar
         if eh_predador(obter_animal(prado, pos)):   # animal e predador
-            novas_poss = tuple(filter(lambda n_p: eh_presa(obter_animal(prado, n_p)), possibilidades))
+            novas_poss = tuple(filter(lambda n_p: not eh_posicao_livre(prado, n_p) \
+                                                  and eh_presa(obter_animal(prado, n_p)), possibilidades))
             if novas_poss:  # verifica se existem presas ao redor do animal
                 return novas_poss[obter_valor_numerico(prado, pos) % len(novas_poss)]
 
