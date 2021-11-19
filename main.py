@@ -115,22 +115,17 @@ def ordenar_posicoes(tup):
     retorna o tuplo original ordenado
     """
 
-    lst = list(tup)
+    return sorted(sorted(tup, key= obter_pos_x), key= obter_pos_y)
 
-    for i in range(len(lst) - 1):
-        min_index = i
-        for j in range(i + 1, len(lst)):  # procura o menor elemento da lista (isto é menor y, menor x)
-            if obter_pos_y(lst[j]) < obter_pos_y(lst[min_index]):
-                min_index = j
 
-            elif obter_pos_y(lst[j]) == obter_pos_y(lst[min_index]):
-                if obter_pos_x(lst[j]) < obter_pos_x(lst[min_index]):
-                    min_index = j
+def posicoes_iguais_rapida(p1, p2)-> bool:
+    """
+    posicoes_iguais_rapida: posicao x posicao -> bool
+    Funcao mais rapida para igualar posicoes
+    requer assumir que p1 e p2 sejam posicoes
+    """
 
-        lst[i], lst[min_index] = lst[min_index], lst[i]
-
-    return tuple(lst)
-
+    return obter_pos_y(p1) == obter_pos_y(p2) and obter_pos_x(p1) == obter_pos_x(p2)
 
 """
 TAD Animal:
@@ -296,10 +291,8 @@ def eh_animal(arg):
     Esta funcao verifica se o argumento passado corresponde a um animal
     """
 
-    # DEVE HAVER algo REDUNDANTE COM O CHECK EM CIMA E AS LENGTHS TOO BAD
-
     if type(arg) != dict or not all(map(lambda x: x in ["tipo", "especie", "repro", "comida"], arg)) or \
-            not all(map(lambda x: x in arg, ["tipo", "especie", "repro"])) or not (len(arg) == 3 or len(arg) == 4):
+            not all(map(lambda x: x in arg, ["tipo", "especie", "repro"])):
         return False
 
     #### verificar tipo
@@ -552,7 +545,8 @@ def obter_numero_presas(prado):
 def obter_posicao_animais(prado):
     """
     obter_posicao_animais: prado -> tuplo posicoes
-    devolve um tuplo com as posicoes do prado ocupadas por animais, ordenadas em ordem de leitura do prado.
+    devolve um tuplo com as posicoes do prado ocupadas por animais,
+     ordenadas em ordem de leitura do prado.
     """
     ani_pos = []
     for animal in prado[2]:
@@ -567,8 +561,8 @@ def obter_animal(prado, pos):
     devolve o animal que esta na posicao pos
     """
 
-    for animal in prado[2]:
-        if posicoes_iguais(pos, animal[1]):
+    for animal in prado[2]:                     # posicoes_iguais e uma funcao muito cara
+        if posicoes_iguais_rapida(pos, animal[1]):
             return animal[0]
 
 
@@ -579,7 +573,7 @@ def eliminar_animal(prado, pos):
     """
 
     for animal in prado[2]:
-        if posicoes_iguais(pos, animal[1]):
+        if posicoes_iguais_rapida(pos, animal[1]):
             prado[2].remove(animal)
             break
 
@@ -594,7 +588,7 @@ def mover_animal(prado, pos_antiga, pos):
     """
 
     for animal in prado[2]:
-        if posicoes_iguais(pos_antiga, animal[1]):
+        if posicoes_iguais_rapida(pos_antiga, animal[1]):
             animal[1] = pos
             break
 
@@ -634,7 +628,7 @@ def eh_posicao_animal(prado, pos):
     """
 
     for animal in prado[2]:
-        if posicoes_iguais(animal[1], pos):
+        if posicoes_iguais_rapida(animal[1], pos):
             return True
 
     return False
@@ -649,7 +643,7 @@ def eh_posicao_obstaculo(prado, pos):
 
     return obter_pos_x(pos) == 0 or obter_pos_y(pos) == 0 \
            or obter_pos_x(pos) == obter_tamanho_x(prado) - 1 or obter_pos_y(pos) == obter_tamanho_y(prado) - 1 \
-           or any(map(lambda rochedo: posicoes_iguais(rochedo, pos), prado[1]))
+           or any(map(lambda rochedo: posicoes_iguais_rapida(rochedo, pos), prado[1]))
 
 
 def eh_posicao_livre(prado, pos):
@@ -858,3 +852,11 @@ def simula_ecossistema(fich: str, geracoes, v: bool) -> tuple:
     return predadores, presas
 
 
+import cProfile
+import pstats
+with cProfile.Profile() as pr:
+    simula_ecossistema('config4.txt', 20, True)
+
+stats = pstats.Stats(pr)
+stats.sort_stats(pstats.SortKey.CALLS)
+stats.print_stats()
