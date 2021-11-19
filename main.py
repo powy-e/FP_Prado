@@ -851,12 +851,3 @@ def simula_ecossistema(fich: str, geracoes, v: bool) -> tuple:
 
     return predadores, presas
 
-
-import cProfile
-import pstats
-with cProfile.Profile() as pr:
-    simula_ecossistema('config4.txt', 20, True)
-
-stats = pstats.Stats(pr)
-stats.sort_stats(pstats.SortKey.CALLS)
-stats.print_stats()
