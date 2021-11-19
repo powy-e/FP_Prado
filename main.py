@@ -9,15 +9,24 @@ eduardo.nazario@tecnico.ulisboa.pt
 """
 TAD Posicao:
 
-operacoes basicas:
-    cria_posicao: int x int -> posicao
-    cria_copia_posicao: posicao -> posicao
-    obter_pos_x: posicao -> int
-    obter_pos_y: posicao -> int
-    eh_posicao: universal -> booleano
-    posicoes_iguais: posicao x posicao -> booleano
-    posicao_para_str: posicao -> str
+Operacoes basicas:
+    Construtores:
+        -cria_posicao: int x int -> posicao
+        -cria_copia_posicao: posicao -> posicao
+    Seletores:
+        -obter_pos_x: posicao -> int
+        -obter_pos_y: posicao -> int
+    Reconhecedor:
+        -eh_posicao: universal -> booleano
+    Teste:
+        -posicoes_iguais: posicao x posicao -> booleano
+    Transformador:
+        -posicao_para_str: posicao -> str
 
+Funcoes de Alto Nivel:
+    - obter_posicoes_adjacentes: posicao -> tuplo
+    - ordenar_posicoes: tuplo -> tuplo
+    - posicoes_iguais_rapida: posicao x posicao -> bool
 
 Esta TAD utiliza como representacao interna tuplos 
 """
@@ -117,7 +126,7 @@ def ordenar_posicoes(tup):
     lst = list(tup)
     for i in range(len(lst) - 1):
         min_index = i
-        for j in range(i + 1, len(lst)):  # procura o menor elemento da lista (isto é menor y, menor x)
+        for j in range(i + 1, len(lst)):  # procura o menor elemento da lista
             if obter_pos_y(lst[j]) < obter_pos_y(lst[min_index]):
                 min_index = j
             elif obter_pos_y(lst[j]) == obter_pos_y(lst[min_index]):
@@ -126,36 +135,49 @@ def ordenar_posicoes(tup):
         lst[i], lst[min_index] = lst[min_index], lst[i]
     return tuple(lst)
 
-def posicoes_iguais_rapida(p1, p2)-> bool:
+
+def posicoes_iguais_rapida(p1, p2) -> bool:
     """
     posicoes_iguais_rapida: posicao x posicao -> bool
-    Funcao mais rapida para igualar posicoes
+    Funcao mais rapida para igualar posicoes,
     requer assumir que p1 e p2 sejam posicoes
     """
 
     return obter_pos_y(p1) == obter_pos_y(p2) and obter_pos_x(p1) == obter_pos_x(p2)
 
+
 """
 TAD Animal:
 
 operacoes basicas:
-    cria_animal: str x int x int -> animal
-    cria_copia_animal: animal -> animal
-    obter_especie: animal -> str
-    obter_freq_reproducao: animal -> int
-    obter_freq_alimentacao: animal -> int
-    obter_idade: animal -> int
-    obter_fome: animal -> int
-    aumenta_idade: animal -> animal
-    reset_idade: animal -> animal
-    aumenta_fome: animal -> animal
-    reset_fome: animal -> animal
-    eh_animal: universal -> booleano
-    eh_predador: universal -> booleano
-    eh_presa: universal -> booleano
-    animais_iguais: animal x animal -> booleano
-    animal_para_char: animal -> str
-    animal_para_str: animal -> str
+    Construtores:
+        -cria_animal: str x int x int -> animal
+        -cria_copia_animal: animal -> animal
+    Seletores:
+        -obter_especie: animal -> str
+        -obter_freq_reproducao: animal -> int
+        -obter_freq_alimentacao: animal -> int
+        -obter_idade: animal -> int
+        -obter_fome: animal -> int
+    Modificadores:
+        -aumenta_idade: animal -> animal
+        -reset_idade: animal -> animal
+        -aumenta_fome: animal -> animal
+        -reset_fome: animal -> animal
+    Reconhecedores:
+        -eh_animal: universal -> booleano
+        -eh_predador: universal -> booleano
+        -eh_presa: universal -> booleano
+    Teste:
+        -animais_iguais: animal x animal -> booleano
+    Transformadores:    
+        -animal_para_char: animal -> str
+        -animal_para_str: animal -> str
+        
+Funcoes Alto Nivel:
+    -eh_animal_fertil: animal -> booleano
+    -eh_animal_faminto: animal -> booleano
+    -reproduz_animal: animal -> animal
 
 
 TAD animal utiliza dicionarios como representacao interna
@@ -168,12 +190,15 @@ def cria_animal(especie, repro, comida):
     esta funcao cria um animal com base nos argumentos dados (especie, frequencia de reproducao e de alimentacao)
     """
 
+    # validacao de elementos
     if type(especie) != str or type(repro) != int or type(comida) != int or \
             not especie or repro <= 0 or comida < 0:
         raise ValueError("cria_animal: argumentos invalidos")
 
+    # Cria o dicionario
     animal = {"especie": especie, "repro": [0, repro]}
 
+    # Classifica o animal
     if comida != 0:
         animal["comida"] = [0, comida]
         animal["tipo"] = "predador"
@@ -189,13 +214,14 @@ def cria_copia_animal(animal):
     cria uma copia de um animal
     """
 
+    # Validacao de argumento
     if not eh_animal(animal):
         raise ValueError("cria_copia_animal: argumentos invalidos")
 
-    # fazer copia dos elementos (shallow)
+    # Fazer copia dos elementos (shallow)
     animal_novo = {key: animal[key] for key in (animal)}
 
-    # fazer copia dos dicionarios
+    # Fazer copia dos dicionarios
     if animal_novo["tipo"] == "predador":
         animal_novo["comida"] = animal_novo["comida"][:]
     animal_novo["repro"] = animal_novo["repro"][:]
@@ -226,6 +252,7 @@ def obter_freq_alimentacao(animal):
     obter_freq_alimentacao: animal -> int
     retorna a frequencia de alimentacao de um animal
     """
+
     if animal["tipo"] == "predador":
         return animal["comida"][1]
     return 0
@@ -245,6 +272,7 @@ def obter_fome(animal):
     obter_fome: animal -> int
     retorna a fome do animal
     """
+
     if animal["tipo"] == "predador":
         return animal["comida"][0]
     return 0
@@ -255,6 +283,7 @@ def aumenta_idade(animal):
     aumenta_idade: animal -> animal
     devolve o animal com a idade incrementada por 1
     """
+
     animal["repro"][0] += 1
 
     return animal
@@ -276,6 +305,7 @@ def aumenta_fome(animal):
     aumenta_fome: animal -> animal
     devolve o animal com a fome incrementada por 1 se este for um predador, caso contrario devolve o animal
     """
+
     if animal["tipo"] == "predador":
         animal["comida"][0] += 1
 
@@ -287,6 +317,7 @@ def reset_fome(animal):
     reset_fome: animal -> animal
     devolve o animal com a fome definifa a 0 se este for um predador, caso contrario devolve o animal
     """
+
     if animal["tipo"] == "predador":
         animal["comida"][0] = 0
 
@@ -298,14 +329,14 @@ def eh_animal(arg):
     eh_animal: universal -> booleano
     Esta funcao verifica se o argumento passado corresponde a um animal
     """
-
+    # Valida Argumentos
     if type(arg) != dict or not all(map(lambda x: x in ["tipo", "especie", "repro", "comida"], arg)) or \
             not all(map(lambda x: x in arg, ["tipo", "especie", "repro"])):
         return False
 
-    #### verificar tipo
+    # Verificar tipo
     if arg["tipo"] == "predador":
-        ### verificar comida
+        # Verificar comida
         if "comida" in arg:
             if type(arg["comida"]) != list or len(arg["comida"]) != 2 or type(arg["comida"][0]) != int or \
                     type(arg["comida"][1]) != int or arg["comida"][0] < 0 or arg["comida"][1] <= 0:
@@ -319,11 +350,11 @@ def eh_animal(arg):
     else:
         return False
 
-    ##verificar especie
+    # Verificar especie
     if type(arg["especie"]) != str or not arg["especie"]:
         return False
 
-    # idade/reproducao
+    # Idade/Reproducao
     if type(arg["repro"]) != list or len(arg["repro"]) != 2 or type(arg["repro"][0]) != int or \
             type(arg["repro"][1]) != int or arg["repro"][0] < 0 or arg["repro"][1] <= 0:
         return False
@@ -352,8 +383,7 @@ def eh_presa(arg):
 def animais_iguais(animal_1, animal_2):
     """
     animais_iguais: animal x animal -> booleano
-    devolve True apenas se a1 e a2 s ̃ao animais e sa ̃o iguais.
-
+    devolve True apenas se a1 e a2 sao animais e sao iguais.
     """
 
     return eh_animal(animal_1) and eh_animal(animal_2) and animal_1 == animal_2
@@ -387,7 +417,7 @@ def animal_para_str(animal):
     return string
 
 
-### ALTO NIVEl
+ ### ALTO NIVEl
 
 def eh_animal_fertil(animal):
     """
@@ -429,23 +459,29 @@ def reproduz_animal(animal):
 TAD Prado:
 
 operacoes basicas:
-    cria_prado: posicao x tuplo x tuplo x tuplo -> prado
-    cria_copia_prado: prado -> prado
-    obter_tamanho_x: prado -> int
-    obter_tamanho_y: prado -> int
-    obter_numero_predadores: prado -> int
-    obter_numero_presas: prado -> int
-    obter_posicao_animais: prado -> tuplo posicoes
-    obter_animal: prado x posicao -> animal
-    eliminar_animal: prado x posicao -> prado
-    mover_animal: prado x posicao x posicao -> prado
-    inserir_animal: prado x animal x posicao -> prado
-    eh_prado: universal -> booleano
-    eh_posicao_animal: prado x posicao -> booleano
-    eh_posicao_obstaculo: prado x posicao -> booleano
-    eh_posicao_livre: prado x posicao -> booleano
-    prados_iguais: prado x prado -> booleano
-    prado_para_str: prado -> str
+    Construtores:
+        -cria_prado: posicao x tuplo x tuplo x tuplo -> prado
+        -cria_copia_prado: prado -> prado
+    Seletores:
+        -obter_tamanho_x: prado -> int
+        -obter_tamanho_y: prado -> int
+        -obter_numero_predadores: prado -> int
+        -obter_numero_presas: prado -> int
+        -obter_posicao_animais: prado -> tuplo posicoes
+        -obter_animal: prado x posicao -> animal
+    Modificadores:
+        -eliminar_animal: prado x posicao -> prado
+        -mover_animal: prado x posicao x posicao -> prado
+        -inserir_animal: prado x animal x posicao -> prado
+    Reconhecedores:    
+        -eh_prado: universal -> booleano
+        -eh_posicao_animal: prado x posicao -> booleano
+        -eh_posicao_obstaculo: prado x posicao -> booleano
+        -eh_posicao_livre: prado x posicao -> booleano
+    Teste:
+        -prados_iguais: prado x prado -> booleano
+    Transformador:
+        -prado_para_str: prado -> str
 
 Este TAD utiliza como representacao interna uma lista
 """
@@ -458,6 +494,7 @@ def verificar_rochas_animais(limite, rochas, ani_pos) -> bool:
     esta funcao retorna True se todas as rochas/animais se encontram dentro dos
                                                                         limites
     """
+
     if rochas:
         for rochedo in rochas:
             if not (0 < obter_pos_x(rochedo) < obter_pos_x(limite)) \
@@ -482,6 +519,7 @@ def cria_prado(limite, rochas, animais, ani_pos):
     retorna um prado
     """
 
+    # Validacao de Argumentos
     if not eh_posicao(limite) or type(rochas) != tuple or any(map(lambda x: not eh_posicao(x), rochas)) or \
             type(animais) != tuple or not animais or any(map(lambda x: not eh_animal(x), animais)) or \
             type(ani_pos) != tuple or len(ani_pos) != len(animais) or any(map(lambda x: not eh_posicao(x), ani_pos)) \
@@ -569,7 +607,7 @@ def obter_animal(prado, pos):
     devolve o animal que esta na posicao pos
     """
 
-    for animal in prado[2]:                     # posicoes_iguais e uma funcao muito cara
+    for animal in prado[2]:  # posicoes_iguais e uma funcao muito cara
         if posicoes_iguais_rapida(pos, animal[1]):
             return animal[0]
 
@@ -640,7 +678,6 @@ def eh_posicao_animal(prado, pos):
             return True
 
     return False
-    # return any(map(lambda animal: posicoes_iguais(animal[1], pos), prado[2]))
 
 
 def eh_posicao_obstaculo(prado, pos):
@@ -672,7 +709,7 @@ def prados_iguais(prado1, prado2):
     if eh_prado(prado1) and eh_prado(prado2) and obter_tamanho_y(prado1) == obter_tamanho_y(prado2) \
             and obter_tamanho_x(prado1) == obter_tamanho_x(prado1):
 
-        ## verifica se os rochedos sao iguas
+        # Verifica se os rochedos sao iguas
 
         pos_prado1 = ordenar_posicoes(prado1[1])
         pos_prado2 = ordenar_posicoes(prado2[1])
@@ -682,7 +719,7 @@ def prados_iguais(prado1, prado2):
             if not posicoes_iguais(pos_prado1[i], pos_prado2[i]):
                 return False
 
-        #### verificar os animais e as suas posicoes
+        # Verificar os animais e as suas posicoes
 
         if len(prado1[2]) != len(prado2[2]):
             return False
@@ -706,6 +743,7 @@ def prado_para_str(prado):
     prado_para_str: prado -> str
     devolve uma string que representa o prado
     """
+
     prado_str = ""
     borda = "+" + "-" * (obter_tamanho_x(prado) - 2) + "+"
     prado_str += borda + "\n"
@@ -858,4 +896,3 @@ def simula_ecossistema(fich: str, geracoes, v: bool) -> tuple:
         print(prado_para_str(prado))
 
     return predadores, presas
-
