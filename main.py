@@ -114,9 +114,17 @@ def ordenar_posicoes(tup):
     ordenar_posicoes: tuplo -> tuplo
     retorna o tuplo original ordenado
     """
-
-    return sorted(sorted(tup, key= obter_pos_x), key= obter_pos_y)
-
+    lst = list(tup)
+    for i in range(len(lst) - 1):
+        min_index = i
+        for j in range(i + 1, len(lst)):  # procura o menor elemento da lista (isto é menor y, menor x)
+            if obter_pos_y(lst[j]) < obter_pos_y(lst[min_index]):
+                min_index = j
+            elif obter_pos_y(lst[j]) == obter_pos_y(lst[min_index]):
+                if obter_pos_x(lst[j]) < obter_pos_x(lst[min_index]):
+                    min_index = j
+        lst[i], lst[min_index] = lst[min_index], lst[i]
+    return tuple(lst)
 
 def posicoes_iguais_rapida(p1, p2)-> bool:
     """
